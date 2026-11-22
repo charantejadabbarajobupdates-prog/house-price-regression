@@ -1,0 +1,50 @@
+Rows: 1,460 -> 1,458 after removing 2 outliers | columns: 80
+SalePrice skew: 1.88 -> after log1p: 0.12
+Numeric: 44 (22 skewed, log-transformed) | categorical: 44
+
+[1] 5-fold CV RMSE on log(SalePrice) (lower is better)
+OLS (no regularisation)    0.1374 +- 0.0146
+Ridge                      0.1129 | best alpha 30
+Lasso                      0.1122 | best alpha 0.0005
+XGBoost (tuned)            0.1143
+
+[2] TEST set (price metrics in dollars)
+Ridge                  RMSE(log) 0.1165 | R2 0.919 | MAE $13,781 | MAPE 8.3%
+Lasso                  RMSE(log) 0.1099 | R2 0.928 | MAE $13,111 | MAPE 7.9%
+XGBoost                RMSE(log) 0.1180 | R2 0.917 | MAE $13,522 | MAPE 8.4%
+Lasso + XGBoost blend  RMSE(log) 0.1091 | R2 0.929 | MAE $12,547 | MAPE 7.7%
+Baseline (predict the median price): MAE $57,100
+
+[3] Residual analysis (log scale)
+Mean residual -0.0060 | std 0.1090 | skew -1.52 | kurtosis 7.43
+Error by price band:
+                    MAPE  mean_residual
+band                                   
+Q1 cheapest        0.116         -0.051
+Q2                 0.062          0.011
+Q3                 0.061         -0.011
+Q4 most expensive  0.069          0.027
+5 largest errors:
+        actual  predicted  error_%
+30     40000.0    81885.0    104.7
+1432   64500.0   102501.0     58.9
+916    35311.0    55474.0     57.1
+666   129000.0   182465.0     41.4
+277   141000.0   106005.0    -24.8
+
+[4] Lasso kept 119 of 322 features (the rest were set to zero)
+Top positive:
+skew__GrLivArea              0.108
+cat__Neighborhood_StoneBr    0.105
+cat__Neighborhood_Crawfor    0.093
+cat__Exterior1st_BrkFace     0.082
+cat__Functional_Typ          0.072
+cat__SaleType_New            0.068
+num__OverallQual             0.062
+cat__Neighborhood_BrkSide    0.056
+Top negative:
+cat__MSZoning_C (all)    -0.199
+num__HouseAge            -0.052
+cat__Condition1_RRAe     -0.039
+cat__Heating_Grav        -0.038
+cat__Condition1_Artery   -0.036
